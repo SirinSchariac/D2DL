@@ -59,3 +59,13 @@ def train(net, train_iter, epochs, lr):
         
 net = get_net()
 train(net, train_iter, 5, 0.01)
+
+one_step_preds = net(features)
+# 绘制图像，注意x 和 one_step_preds需要用detach()函数
+# 直接使用numpy()会报错，因为x和one_step_preds是需要梯度的
+# 不能直接转换为numpy格式，所以需要用detach()来分离
+d2l.plot([time, time[tau:]],
+         [x.detach().numpy(), one_step_preds.detach().numpy()], 'time', 'x',
+         legend = ['data', '1-step preds'], xlim=[1, 1000], figsize=(10, 5))
+
+d2l.plt.savefig('one-step-pred.png')
