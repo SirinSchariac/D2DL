@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from d2l import torch as d2l
 
-torch.cuda.is_available()
+# torch.cuda.is_available()
 
 T = 1000
 time = torch.arange(1, T+1, dtype=torch.float32)
