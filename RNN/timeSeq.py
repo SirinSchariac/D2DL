@@ -60,6 +60,7 @@ def train(net, train_iter, epochs, lr):
 net = get_net()
 train(net, train_iter, 5, 0.01)
 
+# 先进行单步预测看看效果
 one_step_preds = net(features)
 # 绘制图像，注意x 和 one_step_preds需要用detach()函数
 # 直接使用numpy()会报错，因为x和one_step_preds是需要梯度的
@@ -68,4 +69,19 @@ d2l.plot([time, time[tau:]],
          [x.detach().numpy(), one_step_preds.detach().numpy()], 'time', 'x',
          legend = ['data', '1-step preds'], xlim=[1, 1000], figsize=(10, 5))
 
-d2l.plt.savefig('one-step-pred.png')
+# d2l.plt.savefig('one-step-pred.png')
+
+# 多步预测
+multi_step_preds = torch.zeros(T)
+# 对于[:n_train+tau]的预测值，直接使用真实值
+multi_step_preds[:n_train + tau] = x[:n_train + tau]
+for i in range(n_train + tau, T):
+    # 用tau个时间步的预测值来预测下一个时间步
+    multi_step_preds[i] = net(multi_step_preds[i - tau:i].reshape((1, -1)))
+
+d2l.plot([time, time[tau:], time[n_train+tau:]],
+         [x.detach().numpy(), one_step_preds.detach().numpy(),
+            multi_step_preds[n_train + tau:].detach().numpy()], 'time', 'x',
+            legend = ['data', '1-step preds', 'multi-step preds'],
+            xlim = [1, 1000], figsize = (10, 5))
+d2l.plt.savefig('multi-step-pred.png')
